@@ -40,6 +40,7 @@ import { Badge } from '@/components/ui/badge';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type UserRole = 'director' | 'educateur' | 'chef_groupe' | 'infirmier' | 'user' | 'normal';
 
@@ -61,6 +62,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { t, direction } = useLanguage();
+  const isMobile = useIsMobile();
 
   let navItems = [
     { name: t('navigation.dashboard'), icon: Home, path: '/dashboard', roles: ['director', 'educateur', 'chef_groupe', 'infirmier', 'user', 'normal', 'postman', 'animateur_general'] },
@@ -87,7 +89,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   // Get the profile picture URL based on user data
   const userProfilePicture = user?.profile_picture 
     ? `http://localhost:8000/storage/profiles/${user.profile_picture.replace(/^profiles\//, '')}`
-    : user?.avatar_url || '/placeholder.svg';
+    : '/placeholder.svg';
 
   return (
     <SidebarProvider>
