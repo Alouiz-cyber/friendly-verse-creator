@@ -30,7 +30,8 @@ const EnfantForm = ({ enfant, onSubmit, onCancel }: EnfantFormProps) => {
       date_examen_medical: enfant?.date_examen_medical ? enfant.date_examen_medical.substring(0, 10) : '',
       resultat_examen: enfant?.resultat_examen || '',
       region: enfant?.region || '',
-      participation_count: enfant?.participation_count || 0
+      participation_count: enfant?.participation_count || 0,
+      floss: enfant?.floss || 0
     }
   });
 
@@ -145,6 +146,25 @@ const EnfantForm = ({ enfant, onSubmit, onCancel }: EnfantFormProps) => {
                       <option key={region} value={region}>{region}</option>
                     ))}
                   </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="floss"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Floss</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    placeholder="Floss value" 
+                    {...field} 
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

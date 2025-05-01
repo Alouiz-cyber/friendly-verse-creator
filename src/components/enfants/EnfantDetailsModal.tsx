@@ -7,7 +7,8 @@ import { Enfant } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   User, Calendar, MapPin, School, Users, Activity, Heart, 
-  Phone, Briefcase, FileText, Flag, ClipboardCheck, PenTool 
+  Phone, Briefcase, FileText, Flag, ClipboardCheck, PenTool,
+  Smile
 } from "lucide-react";
 
 interface Props {
@@ -37,6 +38,7 @@ const EnfantDetailsModal: React.FC<Props> = ({ open, onOpenChange, enfant }) => 
     { icon: Flag, label: t('children.region'), value: enfant.region },
     { icon: Heart, label: t('children.medicalExamDate'), value: enfant.date_examen_medical },
     { icon: ClipboardCheck, label: "Medical Result", value: enfant.resultat_examen },
+    { icon: Smile, label: "Floss", value: enfant.floss },
     { icon: Activity, label: "Status", value: enfant.status },
     { icon: FileText, label: t('children.participations'), value: enfant.participation_count },
     { icon: PenTool, label: "Notes", value: enfant.notes }
