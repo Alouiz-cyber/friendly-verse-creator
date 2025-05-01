@@ -50,6 +50,13 @@ const EnfantForm = ({ enfant, onSubmit, onCancel }: EnfantFormProps) => {
     'Dakhla-Oued Ed-Dahab'
   ];
 
+  const familyRanks = [
+    'Unique',
+    'Aîné',
+    'Cadet',
+    'Benjamin'
+  ];
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -206,7 +213,15 @@ const EnfantForm = ({ enfant, onSubmit, onCancel }: EnfantFormProps) => {
               <FormItem>
                 <FormLabel>Family Rank</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Aîné, Cadet" {...field} />
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    {...field}
+                  >
+                    <option value="">Select family rank</option>
+                    {familyRanks.map(rank => (
+                      <option key={rank} value={rank}>{rank}</option>
+                    ))}
+                  </select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
