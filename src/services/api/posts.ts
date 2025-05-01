@@ -5,7 +5,12 @@ import { Post } from '@/types';
 export const getPosts = async (): Promise<Post[]> => {
   try {
     const response = await api.get('/posts');
-    return response.data?.data || response.data || [];
+    const posts = response.data?.data || response.data || [];
+    
+    // Sort posts from first/oldest to newest
+    return posts.sort((a: Post, b: Post) => {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
   } catch (error) {
     console.error('Error fetching posts:', error);
     return [];
