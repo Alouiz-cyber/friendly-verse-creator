@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -83,6 +84,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const filteredNavItems = user && user.role ? navItems.filter(item => item.roles.includes(user.role as UserRole)) : [];
 
+  // Get the profile picture URL based on user data
+  const userProfilePicture = user?.profile_picture 
+    ? `http://localhost:8000/storage/profiles/${user.profile_picture.replace(/^profiles\//, '')}`
+    : user?.avatar_url || '/placeholder.svg';
+
   return (
     <SidebarProvider>
       <div className={cn(
@@ -161,9 +167,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
           <div className="p-3 border-t border-sidebar-border">
             <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700">
-                <AvatarImage src={user?.profile_picture} />
-                <AvatarFallback className="bg-sidebar-accent text-sidebar-accent-foreground">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+              <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <AvatarImage src={userProfilePicture} alt={user?.name || 'User'} className="h-full w-full object-cover" />
+                <AvatarFallback className="bg-sidebar-accent text-sidebar-accent-foreground">
+                  {user?.name?.charAt(0) || 'U'}
+                </AvatarFallback>
               </Avatar>
               {(!isSidebarCollapsed || isMobileSidebarOpen) && (
                 <div className="flex flex-col overflow-hidden">
