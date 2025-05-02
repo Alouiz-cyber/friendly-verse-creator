@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { format, isValid } from 'date-fns';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Enfant } from '@/types';
-import { Plus, Edit, Trash2, Search, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Eye, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import EnfantForm from '@/components/enfants/EnfantForm';
 import EnfantDetailsModal from '@/components/enfants/EnfantDetailsModal';
@@ -28,10 +28,25 @@ const ITEMS_PER_PAGE = 10;
 
 const enfantsColumns = [
   { key: 'id', label: 'ID' },
-  { key: 'name', label: 'children.fullName' },
-  { key: 'age', label: 'children.age' },
-  { key: 'gender', label: 'children.gender' },
-  { key: 'status', label: 'children.status' }
+  { key: 'name', label: 'Full Name' },
+  { key: 'date_naissance', label: 'Date of Birth' },
+  { key: 'lieu_naissance', label: 'Birthplace' },
+  { key: 'sexe', label: 'Gender' },
+  { key: 'niveau_scolaire', label: 'School Level' },
+  { key: 'nombre_freres', label: 'Number of Brothers' },
+  { key: 'nombre_soeurs', label: 'Number of Sisters' },
+  { key: 'rang_familial', label: 'Family Rank' },
+  { key: 'nom_pere', label: 'Father\'s Name' },
+  { key: 'nom_mere', label: 'Mother\'s Name' },
+  { key: 'contact_parent', label: 'Parent Contact' },
+  { key: 'profession_parent', label: 'Parent Profession' },
+  { key: 'date_examen_medical', label: 'Medical Exam Date' },
+  { key: 'resultat_examen', label: 'Medical Exam Result' },
+  { key: 'region', label: 'Region' },
+  { key: 'participation_count', label: 'Participation Count' },
+  { key: 'floss', label: 'Floss' },
+  { key: 'interests', label: 'Interests' },
+  { key: 'hobbies', label: 'Hobbies' }
 ];
 
 const Enfants = () => {
@@ -157,6 +172,23 @@ const Enfants = () => {
     }
   };
 
+  const exportAllChildrenData = () => {
+    // Make sure we have data to export
+    if (!enfants || enfants.length === 0) {
+      toast.error(t('children.noDataToExport'));
+      return;
+    }
+
+    // Export the data with localized column headers
+    const localizedColumns = enfantsColumns.map(column => ({
+      ...column,
+      label: t(column.key) || column.label // Try to translate, fallback to original label
+    }));
+
+    exportToCSV(enfants, localizedColumns, 'children_full_data.csv');
+    toast.success(t('children.exportSuccess'));
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -187,13 +219,29 @@ const Enfants = () => {
           <div className="flex items-center gap-2">
             <h2 className="text-3xl font-bold">{t('children.managementTitle')}</h2>
             {user?.role === 'director' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportToCSV(enfants, enfantsColumns, 'children.csv')}
-              >
-                {t('children.exportCSV')}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportToCSV(enfants, [
+                    { key: 'id', label: 'ID' },
+                    { key: 'name', label: t('children.fullName') },
+                    { key: 'date_naissance', label: t('children.birthDate') },
+                    { key: 'sexe', label: t('children.gender') },
+                    { key: 'region', label: t('children.region') }
+                  ], 'children_summary.csv')}
+                >
+                  <Download className="mr-2 h-4 w-4" /> {t('children.exportSummary')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportAllChildrenData}
+                  className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+                >
+                  <Download className="mr-2 h-4 w-4" /> {t('children.exportAll')}
+                </Button>
+              </div>
             )}
           </div>
           <Button onClick={() => { setEditingEnfant(null); setIsFormOpen(true); }}>
