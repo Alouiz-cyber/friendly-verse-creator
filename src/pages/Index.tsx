@@ -58,7 +58,7 @@ const Index = () => {
     <div className={`min-h-screen bg-gradient-to-br from-[#2563eb]/10 via-[#64748b]/10 to-[#06b6d4]/10 ${direction === 'rtl' ? 'rtl' : 'ltr'}`}>
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-20 border-b border-[#2563eb]/20">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Logo size="sm" collapsed={false} />
+          <Logo size="sm" showText={true} />
           
           <div className="flex items-center gap-4 mr-4">
             <a 
@@ -228,7 +228,7 @@ const Index = () => {
       <footer className="py-8 px-4 bg-card/50 backdrop-blur-sm border-t border-border/50">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
-            <Logo size="sm" collapsed={false} />
+            <Logo size="sm" showText={true} />
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} {t('general.appName')}
             </p>

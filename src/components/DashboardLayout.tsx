@@ -114,10 +114,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         >
           <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
             {!isSidebarCollapsed && (
-              <Logo size="sm" className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent" collapsed={false} />
+              <Logo size="sm" className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent" collapsed={false} showText={true} />
             )}
             {isSidebarCollapsed && (
-              <Logo size="sm" className="mx-auto" collapsed={true} />
+              <Logo size="sm" className="mx-auto" collapsed={true} showText={false} />
             )}
             <Button 
               variant="ghost" 
