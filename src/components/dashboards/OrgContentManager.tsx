@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { OrgContent } from '@/types';
@@ -358,8 +357,7 @@ export const OrgContentManager: React.FC = () => {
           </Form>
         )}
       </CardContent>
-    </CardContent>
-  </Card>
+    </Card>
   );
 };
 
