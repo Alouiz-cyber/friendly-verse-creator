@@ -13,8 +13,7 @@ import {
   GraduationCap, 
   Briefcase, 
   Stethoscope,
-  Mail,
-  LayoutDashboard
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getUsers } from '@/services/api/users';
@@ -23,8 +22,6 @@ import { getEnfants } from '@/services/api/enfants';
 import { getCartesTechniques } from '@/services/api/cartesTechniques';
 import { getUserCountByRoles } from '@/services/api/users';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import OrgContentManager from './OrgContentManager';
 
 // Utility to return appropriate icon by role
 const getRoleIcon = (role: string) => {
@@ -172,21 +169,35 @@ const DirectorDashboard = () => {
     <div>
       <h2 className="text-3xl font-bold mb-6">{t('directorr.welcome')}</h2>
       
-      <Tabs defaultValue="overview">
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <LayoutDashboard className="h-4 w-4" />
-            {t('dashboard.overview')}
-          </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            {t('dashboard.contentManagement')}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardContent className="p-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">{stat.title}</p>
+                <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
+              </div>
+              <div className="pointer-events-none">{stat.icon}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {roleStats.length > 0 && (
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-2xl font-bold">{t('directorr.staffBreakdown')}</h3>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={() => exportRolesToCSV(roleStats)}
+            >
+              {t('director.exportCSV')}
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stats.map((stat, index) => (
+            {roleStats.map((stat, index) => (
               <Card key={index}>
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
@@ -198,41 +209,8 @@ const DirectorDashboard = () => {
               </Card>
             ))}
           </div>
-
-          {roleStats.length > 0 && (
-            <div className="mt-6">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-2xl font-bold">{t('directorr.staffBreakdown')}</h3>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                  onClick={() => exportRolesToCSV(roleStats)}
-                >
-                  {t('director.exportCSV')}
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {roleStats.map((stat, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-6 flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                        <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
-                      </div>
-                      <div className="pointer-events-none">{stat.icon}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="content">
-          <OrgContentManager />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };
