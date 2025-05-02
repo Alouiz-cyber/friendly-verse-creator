@@ -1,17 +1,26 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { EnhancedCard, EnhancedCardHeader, EnhancedCardContent } from '@/components/ui/enhanced-card';
 import { Logo } from '@/components/Logo';
 import { Home, User, Calendar, FileText, Users, LogIn, Facebook, MessageSquare } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import VideoPlayer from '@/components/VideoPlayer';
-import { MapPin, MapPinHouse } from 'lucide-react';
+import { MapPin, MapPinHouse, History, Target, Sparkles } from 'lucide-react';
+import { getActiveOrgContent } from '@/services/api/orgContent';
+import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
   const { t, direction } = useLanguage();
   const navigate = useNavigate();
+
+  const { data: orgContent, isLoading: isLoadingContent } = useQuery({
+    queryKey: ['active-org-content'],
+    queryFn: getActiveOrgContent,
+  });
 
   const features = [
     {
@@ -52,10 +61,9 @@ const Index = () => {
     }
   ];
 
-  console.log("Attempting to load video from: /home-video.mp4");
-
   return (
     <div className={`min-h-screen bg-gradient-to-br from-[#2563eb]/10 via-[#64748b]/10 to-[#06b6d4]/10 ${direction === 'rtl' ? 'rtl' : 'ltr'}`}>
+      {/* Header section */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-20 border-b border-[#2563eb]/20">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Logo size="sm" collapsed={false} />
@@ -92,19 +100,20 @@ const Index = () => {
         </div>
       </header>
       
+      {/* Hero section with video */}
       <section className="py-16 md:py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#2563eb]/5 to-transparent pointer-events-none" />
         <div className="container mx-auto text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#2563eb] via-[#64748b] to-[#06b6d4] bg-clip-text text-transparent animate-fade-in">
-            {t('general.appFullName')}
+            {orgContent?.title || t('general.appFullName')}
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed">
-            {t('dashboard.welcome')}
+            {orgContent?.description || t('dashboard.welcome')}
           </p>
           
           <div className="max-w-4xl mx-auto mb-12 rounded-xl overflow-hidden shadow-2xl">
             <VideoPlayer 
-              src="/home-video.mp4"
+              src={orgContent?.video_url || "/home-video.mp4"}
               autoPlay
               muted
               loop
@@ -135,6 +144,7 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Organization information section */}
       <section className="py-16 md:py-24 px-4 bg-gradient-to-b from-transparent via-[#2563eb]/5 to-transparent backdrop-blur-sm">
         <div className="container mx-auto">
           <EnhancedCard className="max-w-4xl mx-auto transform hover:-translate-y-1 transition-all duration-500 shadow-xl hover:shadow-2xl border-t-4 border-[#2563eb]" gradient>
@@ -155,10 +165,49 @@ const Index = () => {
               </div>
             </EnhancedCardHeader>
             <EnhancedCardContent>
-              <div className="space-y-8 text-center">
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  {t('organization.description')}
-                </p>
+              <div className="space-y-8">
+                {orgContent?.mission_statement && (
+                  <div className="flex flex-col md:flex-row items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-[#2563eb]/5 to-transparent">
+                    <div className="p-3 rounded-full bg-[#2563eb]/10 text-[#2563eb] shrink-0">
+                      <Target size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">{t('dashboard.missionStatement')}</h3>
+                      <p className="text-muted-foreground">{orgContent.mission_statement}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {orgContent?.vision && (
+                  <div className="flex flex-col md:flex-row items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-[#2563eb]/5 to-transparent">
+                    <div className="p-3 rounded-full bg-[#2563eb]/10 text-[#2563eb] shrink-0">
+                      <Sparkles size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">{t('dashboard.vision')}</h3>
+                      <p className="text-muted-foreground">{orgContent.vision}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {orgContent?.history && (
+                  <div className="flex flex-col md:flex-row items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-[#2563eb]/5 to-transparent">
+                    <div className="p-3 rounded-full bg-[#2563eb]/10 text-[#2563eb] shrink-0">
+                      <History size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">{t('dashboard.history')}</h3>
+                      <p className="text-muted-foreground">{orgContent.history}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {!orgContent?.mission_statement && !orgContent?.vision && !orgContent?.history && (
+                  <p className="text-center text-lg text-muted-foreground leading-relaxed">
+                    {t('organization.description')}
+                  </p>
+                )}
+                
                 <div className="flex flex-col items-center gap-4">
                   <div className="inline-block px-6 py-3 bg-[#2563eb]/10 rounded-xl transform hover:scale-105 transition-transform duration-300">
                     <p className="text-lg font-semibold text-[#2563eb]">
@@ -175,6 +224,7 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Features section */}
       <section className="py-16 md:py-24 px-4 bg-gradient-to-t from-background/50 to-transparent">
         <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[#2563eb] via-[#64748b] to-[#06b6d4] bg-clip-text text-transparent">
@@ -206,6 +256,7 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Call to action section */}
       <section className="py-16 md:py-24 px-4 bg-gradient-to-b from-background/50 via-[#2563eb]/5 to-transparent">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-[#2563eb] to-[#06b6d4] bg-clip-text text-transparent">
@@ -225,6 +276,7 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Footer */}
       <footer className="py-8 px-4 bg-card/50 backdrop-blur-sm border-t border-border/50">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">

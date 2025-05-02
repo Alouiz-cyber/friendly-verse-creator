@@ -1,3 +1,4 @@
+
 // Common shared interfaces
 export interface BaseEntity {
   id: number;
@@ -71,11 +72,11 @@ export interface Enfant extends BaseEntity {
   nom_mere?: string;
   contact_parent?: string;
   profession_parent?: string;
+  region?: string;
   date_examen_medical?: string;
   resultat_examen?: string;
-  region?: string;
-  participation_count?: number;
   floss?: number;
+  participation_count?: number;
   interests?:string;
   hobbies?:string;
 }
@@ -227,4 +228,15 @@ export interface Hobby extends BaseEntity {
   enfant_name?: string;
   hobbies: string[];
   interests: string[];
+}
+
+// Homepage content management
+export interface OrgContent extends BaseEntity {
+  title: string;
+  description: string;
+  video_url: string;
+  mission_statement?: string;
+  vision?: string;
+  history?: string;
+  is_active: boolean;
 }
