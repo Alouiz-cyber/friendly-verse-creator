@@ -34,8 +34,8 @@ export const Logo: React.FC<LogoProps> = ({
         className={cn(
           sizeMap[size], 
           'w-auto', 
-          theme === 'dark' ? 'filter brightness-110' : '',
-          'mix-blend-multiply dark:mix-blend-screen' // This helps with background removal
+          theme === 'dark' ? 'filter brightness-150 contrast-125' : '',
+          theme === 'dark' ? 'mix-blend-screen' : 'mix-blend-multiply'
         )}
         style={{
           backgroundColor: 'transparent',
