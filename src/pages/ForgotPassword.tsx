@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,8 @@ import { Logo } from '@/components/Logo';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/contexts/ThemeContext';
+
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,6 +19,7 @@ const ForgotPassword = () => {
     t,
     direction
   } = useLanguage();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -32,16 +36,19 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-  return <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-transparent">
+
+  return (
+    <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       <div className="max-w-md w-full animate-fade-in">
         <div className="text-center mb-8">
-          <Logo size="lg" className="mx-auto mb-4" />
+          <Logo size="lg" className="mx-auto mb-4" showText={false} />
           <p className="text-ogec-secondary mt-2">{t('general.appFullName')}</p>
         </div>
 
         <Card className="border-ogec-border shadow-lg">
           <CardHeader>
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <ThemeToggle />
               <LanguageSwitcher variant="ghost" showText={false} />
             </div>
             <CardTitle className="text-2xl text-center">{t('auth.forgotPassword')}</CardTitle>
@@ -74,6 +81,8 @@ const ForgotPassword = () => {
           </form>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default ForgotPassword;

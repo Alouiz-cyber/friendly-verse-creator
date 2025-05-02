@@ -1,18 +1,21 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
-  collapsed?: boolean;
+  showText?: boolean;
 }
 
 export const Logo: React.FC<LogoProps> = ({
   className,
   size = 'md',
-  collapsed = false,
+  showText = false,
 }) => {
+  const { theme } = useTheme();
+  
   // Size adjustments
   const sizeMap = {
     sm: 'h-10',
@@ -22,15 +25,19 @@ export const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      {/* Use the SVG file from public folder */}
+      {/* SVG with adaptive coloring based on theme */}
       <img 
-        src="/logo.svg" 
+        src={`/logo.svg`}
         alt="OGEC logo" 
-        className={cn(sizeMap[size], 'w-auto')}
+        className={cn(
+          sizeMap[size], 
+          'w-auto',
+          theme === 'dark' ? 'filter invert opacity-90' : ''
+        )}
       />
 
-      {/* Brand text - only show when not collapsed */}
-      {!collapsed && (
+      {/* Brand text - only show when requested */}
+      {showText && (
         <div className={cn('flex flex-col')}>
           <span
             className={cn(
