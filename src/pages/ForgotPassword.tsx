@@ -9,7 +9,6 @@ import { Logo } from '@/components/Logo';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +16,6 @@ const ForgotPassword = () => {
     t,
     direction
   } = useLanguage();
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -34,11 +32,10 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-  
   return <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       <div className="max-w-md w-full animate-fade-in">
         <div className="text-center mb-8">
-          <Logo size="lg" className="mx-auto mb-4" showText={true} />
+          <Logo size="lg" className="mx-auto mb-4" />
           <p className="text-ogec-secondary mt-2">{t('general.appFullName')}</p>
         </div>
 
@@ -79,5 +76,4 @@ const ForgotPassword = () => {
       </div>
     </div>;
 };
-
 export default ForgotPassword;
