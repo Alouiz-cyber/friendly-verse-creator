@@ -1,14 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,37 +12,48 @@ import { Logo } from '@/components/Logo';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Mail, LockIcon } from "lucide-react";
 import { z } from "zod";
-
 const Login = () => {
-  const { t } = useLanguage();
-  
+  const {
+    t
+  } = useLanguage();
   const loginSchema = z.object({
     email: z.string().email(t('validation.emailInvalid')),
-    password: z.string().min(8, t('validation.passwordMinLength')),
+    password: z.string().min(8, t('validation.passwordMinLength'))
   });
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, loading, pendingModalOpen, setPendingModalOpen } = useAuth();
-
+  const {
+    login,
+    loading,
+    pendingModalOpen,
+    setPendingModalOpen
+  } = useAuth();
   useEffect(() => {
     if (formError) {
       setFormError(null);
     }
   }, [email, password]);
-
   const validateForm = () => {
     try {
-      loginSchema.parse({ email, password });
+      loginSchema.parse({
+        email,
+        password
+      });
       setErrors({});
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const newErrors: { email?: string; password?: string } = {};
-        error.errors.forEach((err) => {
+        const newErrors: {
+          email?: string;
+          password?: string;
+        } = {};
+        error.errors.forEach(err => {
           if (err.path) {
             newErrors[err.path[0] as 'email' | 'password'] = err.message;
           }
@@ -60,17 +63,13 @@ const Login = () => {
       return false;
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     setFormError(null);
     if (!validateForm() || isSubmitting) {
       return;
     }
-    
     setIsSubmitting(true);
-    
     try {
       await login(email, password);
     } catch (error: any) {
@@ -80,9 +79,7 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-ogec-background p-4">
+  return <div className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       <AccountPendingModal open={pendingModalOpen} onClose={() => setPendingModalOpen(false)} />
       <div className="max-w-md w-full animate-fade-in">
         <div className="text-center mb-8 flex flex-col items-center">
@@ -103,32 +100,18 @@ const Login = () => {
           
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              {formError && (
-                <Alert variant="destructive">
+              {formError && <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{formError}</AlertDescription>
-                </Alert>
-              )}
+                </Alert>}
               
               <div className="space-y-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   {t('auth.email')}
                 </Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder={t('auth.emailPlaceholder')} 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={errors.email ? "border-destructive" : ""}
-                  autoComplete="email"
-                  autoFocus
-                  disabled={isSubmitting}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive mt-1">{errors.email}</p>
-                )}
+                <Input id="email" type="email" placeholder={t('auth.emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} className={errors.email ? "border-destructive" : ""} autoComplete="email" autoFocus disabled={isSubmitting} />
+                {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
               </div>
               
               <div className="space-y-2">
@@ -141,28 +124,13 @@ const Login = () => {
                     {t('auth.forgotPassword')}
                   </Link>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={errors.password ? "border-destructive" : ""}
-                  autoComplete="current-password"
-                  disabled={isSubmitting}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive mt-1">{errors.password}</p>
-                )}
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className={errors.password ? "border-destructive" : ""} autoComplete="current-password" disabled={isSubmitting} />
+                {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
               </div>
             </CardContent>
             
             <CardFooter className="flex flex-col">
-              <Button 
-                type="submit" 
-                className="w-full bg-ogec-primary hover:bg-ogec-primary/90" 
-                disabled={isSubmitting || loading}
-              >
+              <Button type="submit" className="w-full bg-ogec-primary hover:bg-ogec-primary/90" disabled={isSubmitting || loading}>
                 {isSubmitting || loading ? t('auth.loggingIn') : t('auth.login')}
               </Button>
               
@@ -176,8 +144,6 @@ const Login = () => {
           </form>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Login;
