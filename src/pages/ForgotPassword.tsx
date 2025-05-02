@@ -32,7 +32,7 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-  return <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-ogec-foreground">
+  return <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       <div className="max-w-md w-full animate-fade-in">
         <div className="text-center mb-8">
           <Logo size="lg" className="mx-auto mb-4" />
