@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,16 +9,16 @@ import { Logo } from '@/components/Logo';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const { t, direction } = useLanguage();
-
+  const {
+    t,
+    direction
+  } = useLanguage();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
       // For now, just show a success message
       toast.success(t('auth.resetEmailSent'), {
@@ -33,9 +32,7 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-ogec-background p-4" dir={direction}>
+  return <div dir={direction} className="min-h-screen flex items-center justify-center p-4 bg-ogec-foreground">
       <div className="max-w-md w-full animate-fade-in">
         <div className="text-center mb-8">
           <Logo size="lg" className="mx-auto mb-4" />
@@ -59,24 +56,11 @@ const ForgotPassword = () => {
                   <Mail className="h-4 w-4" />
                   {t('auth.email')}
                 </Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  placeholder={t('auth.emailPlaceholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                  className={direction === 'rtl' ? 'text-right' : ''}
-                />
+                <Input id="email" type="email" placeholder={t('auth.emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required autoFocus className={direction === 'rtl' ? 'text-right' : ''} />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button 
-                type="submit" 
-                className="w-full bg-ogec-primary hover:bg-ogec-primary/90"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full bg-ogec-primary hover:bg-ogec-primary/90" disabled={loading}>
                 <Mail className={direction === 'rtl' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
                 {loading ? t('auth.sendingResetLink') : t('auth.sendResetLink')}
               </Button>
@@ -90,8 +74,6 @@ const ForgotPassword = () => {
           </form>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ForgotPassword;
