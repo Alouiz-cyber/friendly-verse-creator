@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getEnfants, createEnfant, updateEnfant, deleteEnfant } from '@/services/api/enfants';
@@ -219,29 +220,14 @@ const Enfants = () => {
           <div className="flex items-center gap-2">
             <h2 className="text-3xl font-bold">{t('children.managementTitle')}</h2>
             {user?.role === 'director' && (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => exportToCSV(enfants, [
-                    { key: 'id', label: 'ID' },
-                    { key: 'name', label: t('children.fullName') },
-                    { key: 'date_naissance', label: t('children.birthDate') },
-                    { key: 'sexe', label: t('children.gender') },
-                    { key: 'region', label: t('children.region') }
-                  ], 'children_summary.csv')}
-                >
-                  <Download className="mr-2 h-4 w-4" /> {t('children.exportSummary')}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exportAllChildrenData}
-                  className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
-                >
-                  <Download className="mr-2 h-4 w-4" /> {t('children.exportAll')}
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportAllChildrenData}
+                className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+              >
+                <Download className="mr-2 h-4 w-4" /> {t('children.exportAll')}
+              </Button>
             )}
           </div>
           <Button onClick={() => { setEditingEnfant(null); setIsFormOpen(true); }}>
