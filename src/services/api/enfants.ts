@@ -1,3 +1,4 @@
+
 import api from '@/utils/api';
 import { Enfant } from '@/types';
 
@@ -108,6 +109,22 @@ export const deleteEnfant = async (id: number) => {
     return response.data;
   } catch (error) {
     console.error('Error deleting enfant:', error);
+    throw error;
+  }
+};
+
+// New function to create multiple children records
+export const createMultipleEnfants = async (enfantDataList: Partial<Enfant>[]) => {
+  try {
+    // If the API doesn't support batch creation, we'll create them one by one
+    const results = [];
+    for (const enfantData of enfantDataList) {
+      const result = await createEnfant(enfantData);
+      results.push(result);
+    }
+    return results;
+  } catch (error) {
+    console.error('Error creating multiple enfants:', error);
     throw error;
   }
 };

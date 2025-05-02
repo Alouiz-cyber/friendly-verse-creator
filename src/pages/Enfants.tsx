@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getEnfants, createEnfant, updateEnfant, deleteEnfant } from '@/services/api/enfants';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { format, isValid } from 'date-fns';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Enfant } from '@/types';
-import { Plus, Edit, Trash2, Search, Eye, Download } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Eye, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import EnfantForm from '@/components/enfants/EnfantForm';
 import EnfantDetailsModal from '@/components/enfants/EnfantDetailsModal';
@@ -22,7 +22,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useAuth } from '@/contexts/AuthContext';
-import { exportToCSV } from '@/utils/exportCsv';
+import { exportToCSV, importFromCSV } from '@/utils/csvUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ITEMS_PER_PAGE = 10;
@@ -54,6 +54,7 @@ const Enfants = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -63,6 +64,7 @@ const Enfants = () => {
   const [editingEnfant, setEditingEnfant] = useState<Enfant | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedEnfant, setSelectedEnfant] = useState<Enfant | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['enfants'],
@@ -135,6 +137,94 @@ const Enfants = () => {
   const handleEditClick = (enfant: Enfant) => {
     setEditingEnfant(enfant);
     setIsFormOpen(true);
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    setIsImporting(true);
+    
+    try {
+      const importedData = await importFromCSV(file);
+      console.log('Imported data:', importedData);
+      
+      if (!importedData.length) {
+        toast.error(t('children.importNoData'));
+        return;
+      }
+      
+      // Process and create children records
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const item of importedData) {
+        try {
+          // Map CSV data to Enfant structure
+          const enfantData: Partial<Enfant> = {
+            name: item['Full Name'] || item['name'],
+            date_naissance: item['Date of Birth'] || item['date_naissance'],
+            lieu_naissance: item['Birthplace'] || item['lieu_naissance'],
+            sexe: item['Gender'] || item['sexe'],
+            niveau_scolaire: item['School Level'] || item['niveau_scolaire'],
+            nombre_freres: typeof item['Number of Brothers'] !== 'undefined' ? item['Number of Brothers'] : item['nombre_freres'],
+            nombre_soeurs: typeof item['Number of Sisters'] !== 'undefined' ? item['Number of Sisters'] : item['nombre_soeurs'],
+            rang_familial: item['Family Rank'] || item['rang_familial'],
+            nom_pere: item["Father's Name"] || item['nom_pere'],
+            nom_mere: item["Mother's Name"] || item['nom_mere'],
+            contact_parent: item['Parent Contact'] || item['contact_parent'],
+            profession_parent: item['Parent Profession'] || item['profession_parent'],
+            date_examen_medical: item['Medical Exam Date'] || item['date_examen_medical'],
+            resultat_examen: item['Medical Exam Result'] || item['resultat_examen'],
+            region: item['Region'] || item['region'],
+            floss: typeof item['Floss'] !== 'undefined' ? item['Floss'] : item['floss'],
+            interests: item['Interests'] || item['interests'],
+            hobbies: item['Hobbies'] || item['hobbies']
+          };
+          
+          // Ensure we have a name, which is a required field
+          if (!enfantData.name) {
+            console.error('Missing name for record:', item);
+            errorCount++;
+            continue;
+          }
+          
+          // Create the enfant record
+          await createEnfant(enfantData);
+          successCount++;
+        } catch (error) {
+          console.error('Error creating record:', error);
+          errorCount++;
+        }
+      }
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['enfants'] });
+      
+      // Show result message
+      if (successCount > 0) {
+        toast.success(
+          t('children.importSuccess', [String(successCount), String(errorCount)])
+        );
+      } else {
+        toast.error(t('children.importError'));
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast.error(typeof error === 'string' ? error : t('children.importGeneralError'));
+    } finally {
+      setIsImporting(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const filteredEnfants = Array.isArray(enfants)
@@ -220,14 +310,34 @@ const Enfants = () => {
           <div className="flex items-center gap-2">
             <h2 className="text-3xl font-bold">{t('children.managementTitle')}</h2>
             {user?.role === 'director' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={exportAllChildrenData}
-                className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
-              >
-                <Download className="mr-2 h-4 w-4" /> {t('children.exportAll')}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportAllChildrenData}
+                  className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+                >
+                  <Download className="mr-2 h-4 w-4" /> {t('children.exportAll')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleImportClick}
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+                  disabled={isImporting}
+                >
+                  <Upload className="mr-2 h-4 w-4" /> 
+                  {isImporting ? t('children.importing') : t('children.import')}
+                </Button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  disabled={isImporting}
+                />
+              </div>
             )}
           </div>
           <Button onClick={() => { setEditingEnfant(null); setIsFormOpen(true); }}>
