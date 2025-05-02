@@ -138,7 +138,7 @@ const Register = () => {
       }
     }
   };
-  return <div className="min-h-screen flex items-center justify-center p-4 py-10 bg-ogec-foreground">
+  return <div className="min-h-screen flex items-center justify-center p-4 py-10 bg-transparent">
       <AccountPendingModal open={pendingModalOpen} onClose={() => {
       setPendingModalOpen(false);
       navigate('/login');
