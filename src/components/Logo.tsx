@@ -27,11 +27,20 @@ export const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      {/* Logo image */}
+      {/* Logo image with transparent background */}
       <img
         src="/lovable-uploads/595db481-6349-4391-a212-a294910b979f.png"
         alt="OGEC logo"
-        className={cn(sizeMap[size], 'w-auto', theme === 'dark' ? 'filter brightness-110' : '')}
+        className={cn(
+          sizeMap[size], 
+          'w-auto', 
+          theme === 'dark' ? 'filter brightness-110' : '',
+          'mix-blend-multiply dark:mix-blend-screen' // This helps with background removal
+        )}
+        style={{
+          backgroundColor: 'transparent',
+          objectFit: 'contain'
+        }}
       />
 
       {/* Brand text - only show when not collapsed and showText is true */}
