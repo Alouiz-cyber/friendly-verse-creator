@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -13,7 +12,8 @@ import {
   GraduationCap, 
   Briefcase, 
   Stethoscope,
-  Mail
+  Mail,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getUsers } from '@/services/api/users';
@@ -22,6 +22,8 @@ import { getEnfants } from '@/services/api/enfants';
 import { getCartesTechniques } from '@/services/api/cartesTechniques';
 import { getUserCountByRoles } from '@/services/api/users';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { exportToCSV, prepareDataForExport } from '@/utils/exportCsv';
+import { toast } from 'sonner';
 
 // Utility to return appropriate icon by role
 const getRoleIcon = (role: string) => {
@@ -45,52 +47,7 @@ const getRoleIcon = (role: string) => {
   }
 };
 
-// Helper to generate CSV and export
-const exportRolesToCSV = (roleStats: { title: string, value: number }[]) => {
-  if (!roleStats || !roleStats.length) return;
-  const csvRows: string[] = [];
-  // Add header
-  csvRows.push("Role,Count");
-  // Add rows
-  roleStats.forEach(stat => {
-    // Surround role with quotes to handle spaces/commas
-    csvRows.push(`"${stat.title}",${stat.value}`);
-  });
-  const csvContent = csvRows.join('\r\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'staff_breakdown.csv';
-  a.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 100);
-};
-
-// Helper: generic CSV export utility
-const exportToCSV = (data: any[], columns: { key: string, label: string }[], filename: string) => {
-  if (!data || !data.length) return;
-  // Generate header row
-  const header = columns.map(col => `"${col.label}"`).join(',');
-  // Generate data rows
-  const rows = data.map(item => columns.map(col => `"${item[col.key] ?? ''}"`).join(','));
-  const csvContent = [header, ...rows].join('\r\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 100);
-};
-
+// Director Dashboard Component
 const DirectorDashboard = () => {
   const { t } = useLanguage();
   
@@ -116,7 +73,7 @@ const DirectorDashboard = () => {
     queryFn: getUserCountByRoles
   });
 
-  // NEW: Prepare datasets for CSV exporting
+  // Prepare datasets for CSV exporting
   const users = Array.isArray(usersData) ? usersData : [];
   const programs = Array.isArray(programsData) ? programsData : [];
   const enfants = Array.isArray(enfantsData) ? enfantsData : [];
@@ -124,9 +81,9 @@ const DirectorDashboard = () => {
 
   const [phases, setPhases] = React.useState<any[]>([]);
   const [teams, setTeams] = React.useState<any[]>([]);
-  // Lazy load phases & teams for CSV since there are no hooks
+  
+  // Lazy load phases & teams for CSV
   React.useEffect(() => {
-    // Import here to avoid circular deps with React Query (if any)
     import('@/services/api/phases').then(api => {
       api.getPhases().then(setPhases);
     });
@@ -134,6 +91,64 @@ const DirectorDashboard = () => {
       api.getTeams().then(setTeams);
     });
   }, []);
+
+  // Export roles statistics to CSV in an organized way
+  const exportRolesToCSV = (roleStats: { title: string, value: number }[]) => {
+    if (!roleStats || !roleStats.length) return;
+    
+    const columns = [
+      { key: 'title', label: t('directorr.roleTitle', ['Role']) },
+      { key: 'value', label: t('directorr.staffCount', ['Count']) },
+    ];
+    
+    exportToCSV(roleStats, columns, 'staff_breakdown.csv');
+    toast.success(t('director.exportSuccess', ['Staff data exported successfully']));
+  };
+  
+  // New function to export staff data with more details
+  const exportStaffData = () => {
+    if (!users || users.length === 0) return;
+    
+    const columns = [
+      { key: 'id', label: t('members.table.id', ['ID']) },
+      { key: 'name', label: t('members.table.name', ['Name']) },
+      { key: 'email', label: t('members.table.email', ['Email']) },
+      { key: 'role', label: t('members.table.role', ['Role']) },
+      { key: 'phone', label: t('members.table.phone', ['Phone']) },
+      { key: 'created_at', label: t('members.table.createdAt', ['Joined']) },
+    ];
+    
+    // Prepare data with better formatting for dates
+    const preparedData = prepareDataForExport(users, {
+      dateFields: ['created_at', 'updated_at'],
+    });
+    
+    exportToCSV(preparedData, columns, 'staff_detailed.csv');
+    toast.success(t('director.exportSuccess', ['Staff data exported successfully']));
+  };
+  
+  // Export children data with better organization
+  const exportChildrenData = () => {
+    if (!enfants || enfants.length === 0) return;
+    
+    const columns = [
+      { key: 'id', label: t('children.table.id', ['ID']) },
+      { key: 'name', label: t('children.table.name', ['Name']) },
+      { key: 'date_naissance', label: t('children.table.birthDate', ['Birth Date']) },
+      { key: 'sexe', label: t('children.table.gender', ['Gender']) },
+      { key: 'region', label: t('children.table.region', ['Region']) },
+      { key: 'niveau_scolaire', label: t('children.table.schoolLevel', ['School Level']) },
+      { key: 'participation_count', label: t('children.table.camps', ['Participations']) },
+    ];
+    
+    // Prepare data with better formatting
+    const preparedData = prepareDataForExport(enfants, {
+      dateFields: ['date_naissance', 'date_examen_medical'],
+    });
+    
+    exportToCSV(preparedData, columns, 'children_data.csv');
+    toast.success(t('director.exportSuccess', ['Children data exported successfully']));
+  };
 
   if (isLoadingUsers || isLoadingEnfants || isLoadingPrograms || loadingCounts) {
     return (
@@ -187,14 +202,32 @@ const DirectorDashboard = () => {
         <div className="mt-6">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-2xl font-bold">{t('directorr.staffBreakdown')}</h3>
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs"
-              onClick={() => exportRolesToCSV(roleStats)}
-            >
-              {t('director.exportCSV')}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+                onClick={() => exportRolesToCSV(roleStats)}
+              >
+                {t('director.exportCSV')}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+                onClick={exportStaffData}
+              >
+                {t('director.exportStaffDetailed', ['Export Staff Details'])}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+                onClick={exportChildrenData}
+              >
+                {t('director.exportChildrenData', ['Export Children Data'])}
+              </Button>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {roleStats.map((stat, index) => (
