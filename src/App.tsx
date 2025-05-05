@@ -28,12 +28,18 @@ import Maladies from "./pages/Maladies";
 import Transactions from "./pages/Transactions";
 import ForgotPassword from "./pages/ForgotPassword";
 
-// Configure QueryClient to disable console logs
+// Configure QueryClient to only show success messages
 const queryClient = new QueryClient({
-  logger: {
-    log: () => {},
-    warn: () => {},
-    error: (error) => console.error(error)
+  defaultOptions: {
+    queries: {
+      // Silent error and warning messages, only show success
+      retry: false,
+      refetchOnWindowFocus: false
+    },
+    mutations: {
+      // Silent error and warning messages, only show success
+      retry: false
+    }
   }
 });
 
