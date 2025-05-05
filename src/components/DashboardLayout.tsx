@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -17,7 +16,6 @@ import {
   Book,
   Menu,
   Palette,
-  Bell,
   Pill,
   Languages,
   Wallet
@@ -258,10 +256,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <div className="ml-auto flex items-center gap-2">
               <LanguageSwitcher />
               <ThemeToggle />
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell size={18} />
-                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">3</span>
-              </Button>
               <span className="hidden md:block text-sm font-medium text-muted-foreground">
                 {t('dashboard.welcome')}, {user?.name?.split(' ')[0] || 'User'}
               </span>
