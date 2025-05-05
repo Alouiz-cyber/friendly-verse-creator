@@ -98,11 +98,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      console.log("Attempting login with:", { email });
+      setLoading(true);
       const response = await api.post('/login', { email, password });
+      console.log("Login response:", response.data);
+      
+      // Check if the response has the expected structure
+      if (!response.data || !response.data.data) {
+        console.error("Unexpected response structure:", response.data);
+        throw new Error(t('validation.credentialsError'));
+      }
+      
       const { user: userData, access_token } = response.data.data;
+      
+      if (!userData || !access_token) {
+        console.error("Missing user data or token in response");
+        throw new Error(t('validation.credentialsError'));
+      }
 
       if (userData.status !== "active") {
         setPendingModalOpen(true);
+        setLoading(false);
         return;
       }
       
@@ -118,7 +134,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }, 0);
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        // Check if there's a specific error message from the server
+        if (error.response.data && error.response.data.message) {
+          throw new Error(error.response.data.message);
+        }
+      }
+      
+      // Generic error message as fallback
       throw new Error(t('validation.credentialsError'));
+    } finally {
+      setLoading(false);
     }
   };
 

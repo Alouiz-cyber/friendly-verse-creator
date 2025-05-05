@@ -9,7 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 15000, // Increased to 15 seconds for slower networks
 });
 
 // Add a request interceptor to include the token
@@ -50,8 +50,16 @@ api.interceptors.response.use(
           window.location.href = '/login';
         }
       }
+      
+      // Add more specific error message handling
+      if (error.response.data && error.response.data.message) {
+        error.message = error.response.data.message;
+      } else if (error.response.data && error.response.data.error) {
+        error.message = error.response.data.error;
+      }
     } else if (error.request) {
       console.error('API Request made but no response received:', error.request);
+      error.message = 'No response from server. Please check your connection.';
     } else {
       console.error('API Error setting up request:', error.message);
     }
