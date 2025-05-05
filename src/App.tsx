@@ -28,7 +28,14 @@ import Maladies from "./pages/Maladies";
 import Transactions from "./pages/Transactions";
 import ForgotPassword from "./pages/ForgotPassword";
 
-const queryClient = new QueryClient();
+// Configure QueryClient to disable console logs
+const queryClient = new QueryClient({
+  logger: {
+    log: () => {},
+    warn: () => {},
+    error: (error) => console.error(error)
+  }
+});
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

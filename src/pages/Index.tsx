@@ -52,8 +52,6 @@ const Index = () => {
     }
   ];
 
-  console.log("Attempting to load video from: /home-video.mp4");
-
   return (
     <div className={`min-h-screen bg-gradient-to-br from-[#2563eb]/10 via-[#64748b]/10 to-[#06b6d4]/10 ${direction === 'rtl' ? 'rtl' : 'ltr'}`}>
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-20 border-b border-[#2563eb]/20">
