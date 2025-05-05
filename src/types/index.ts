@@ -140,6 +140,12 @@ export interface Program extends BaseEntity {
     id: number;
     name: string;
   };
+  
+  // Adding the missing properties used in ProgramDetailsModal
+  image_url?: string;
+  location?: string;
+  capacity?: number;
+  details_url?: string;
 }
 
 export interface CarteTechnique extends BaseEntity {
